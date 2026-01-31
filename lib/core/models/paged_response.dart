@@ -6,12 +6,19 @@ part 'paged_response.g.dart';
 @JsonSerializable(genericArgumentFactories: true)
 class PagedResponse<T> {
   final List<T> content;
+  @JsonKey(defaultValue: 0)
   final int page;
+  @JsonKey(defaultValue: 0)
   final int size;
+  @JsonKey(defaultValue: 0)
   final int totalPages;
+  @JsonKey(defaultValue: 0)
   final int totalElements;
+  @JsonKey(defaultValue: true)
   final bool first;
+  @JsonKey(defaultValue: true)
   final bool last;
+  @JsonKey(defaultValue: true)
   final bool empty;
 
   PagedResponse({

@@ -1,0 +1,89 @@
+﻿Analyzing marchi...                                             
+
+warning - Unused import: 'package:dio/dio.dart' - lib\core\error\app_exception.dart:1:8 - unused_import
+warning - This default clause is covered by the previous cases - lib\core\error\error_handler.dart:48:7 - unreachable_switch_default
+   info - Angle brackets will be interpreted as HTML - lib\core\models\paged_response.dart:5:29 - unintended_html_in_doc_comment
+  error - Too many positional arguments: 0 expected, but 1 found - lib\core\providers\dio_provider.dart:11:20 - extra_positional_arguments
+warning - Unused import: 'package:flutter/material.dart' - lib\core\routes\app_routes.dart:1:8 - unused_import
+warning - The value of the local variable 'authState' isn't used - lib\core\routes\app_routes.dart:20:9 - unused_local_variable
+   info - 'encryptedSharedPreferences' is deprecated and shouldn't be used. EncryptedSharedPreferences is deprecated and will be removed in v11. The Jetpack Security library is deprecated by Google. Your data will be automatically migrated to custom ciphers on first access. Remove this parameter - it will be ignored - lib\core\storage\secure_storage.dart:11:7 - deprecated_member_use
+  error - The function 'StateNotifierProvider' isn't defined - lib\features\auth\providers\auth_providers.dart:11:27 - undefined_function
+  error - Classes can only extend other classes - lib\features\auth\providers\auth_providers.dart:18:28 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\features\auth\providers\auth_providers.dart:22:64 - extra_positional_arguments
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:27:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:35:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:43:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:46:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:51:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:62:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:64:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:67:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:72:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:83:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:85:9 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:88:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\providers\auth_providers.dart:94:5 - undefined_identifier
+warning - Unused import: '../../../../shared/widgets/loading_widget.dart' - lib\features\auth\screens\login_screen.dart:6:8 - unused_import
+warning - Unused import: 'package:dio/dio.dart' - lib\features\auth\services\auth_service.dart:1:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\orders\screens\cart_screen.dart:137:45 - deprecated_member_use
+  error - Too many positional arguments: 0 expected, but 1 found - lib\features\payments\providers\payment_providers.dart:10:25 - extra_positional_arguments
+  error - Classes can only extend other classes - lib\features\payments\providers\payment_providers.dart:38:31 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\features\payments\providers\payment_providers.dart:41:49 - extra_positional_arguments
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:44:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:44:13 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:47:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:47:15 - undefined_identifier
+  error - A value of type 'ApiResponse<PaymentDto>' can't be returned from the method 'createPayment' because it has a return type of 'Future<PaymentDto?>' - lib\features\payments\providers\payment_providers.dart:48:14 - return_of_invalid_type
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:50:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:50:15 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:53:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:53:15 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:59:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:59:13 - undefined_identifier
+  error - The method 'getPaymentByOrder' isn't defined for the type 'PaymentService' - lib\features\payments\providers\payment_providers.dart:61:45 - undefined_method
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:62:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:62:15 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:64:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:64:15 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:66:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\payments\providers\payment_providers.dart:66:15 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\features\payments\providers\payment_providers.dart:71:25 - undefined_function
+warning - Unused import: '../services/payment_service.dart' - lib\features\payments\screens\payment_screen.dart:6:8 - unused_import
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:111:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:113:15 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:119:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:121:15 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:127:15 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\payments\screens\payment_screen.dart:129:15 - deprecated_member_use
+warning - Unused import: '../services/product_service.dart' - lib\features\products\providers\product_providers.dart:3:8 - unused_import
+warning - Unused import: '../services/product_service.dart' - lib\features\products\providers\product_search_provider.dart:3:8 - unused_import
+warning - Unused import: '../../../../shared/widgets/product_card.dart' - lib\features\products\screens\artisan_product_list_screen.dart:6:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\products\screens\product_detail_screen.dart:148:37 - deprecated_member_use
+warning - Unused import: '../providers/product_providers.dart' - lib\features\products\screens\product_form_screen.dart:4:8 - unused_import
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\products\screens\product_form_screen.dart:182:19 - deprecated_member_use
+warning - Unused import: '../providers/product_providers.dart' - lib\features\products\screens\product_search_screen.dart:4:8 - unused_import
+   info - Don't return 'null' from a function with a return type of 'void' - lib\features\products\services\product_service.dart:175:16 - avoid_returning_null_for_void
+  error - Classes can only extend other classes - lib\shared\providers\cart_provider.dart:19:28 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\shared\providers\cart_provider.dart:20:26 - extra_positional_arguments
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:23:27 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:28:48 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:32:7 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:32:15 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:34:7 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:34:15 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:35:12 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:46:5 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:46:13 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:47:14 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:57:26 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:64:5 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:64:13 - undefined_identifier
+  error - Undefined name 'state' - lib\shared\providers\cart_provider.dart:68:5 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\shared\providers\cart_provider.dart:72:22 - undefined_function
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\empty_widget.dart:24:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\empty_widget.dart:31:68 - deprecated_member_use
+warning - Unused import: 'package:intl/intl.dart' - lib\shared\widgets\order_card.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\order_card.dart:116:22 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\order_card.dart:118:41 - deprecated_member_use
+  error - The name 'MyApp' isn't a class - test\widget_test.dart:16:35 - creation_with_non_type
+

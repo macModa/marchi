@@ -4,7 +4,7 @@ import '../models/auth_request.dart';
 import '../providers/auth_providers.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/loading_widget.dart';
-
+import 'package:go_router/go_router.dart';
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -167,12 +167,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         'Pas encore de compte ? ',
                         style: TextStyle(color: Colors.grey[600]),
                       ),
-                      TextButton(
+                     TextButton(
                         onPressed: () {
-                          // Navigate to Register
+                          context.push('/register'); // <-- this sends user to Register screen
                         },
                         child: const Text('Inscrivez-vous'),
                       ),
+
                     ],
                   ),
                 ],

@@ -9,9 +9,11 @@ part 'order_dto.g.dart';
 class OrderDto {
   final int id;
   final OrderStatus statut;
+  @JsonKey(defaultValue: 0.0)
   final double total;
   final String dateCreation;
   final String dateModification;
+  @JsonKey(defaultValue: 0)
   final int clientId;
   final String clientNom;
   final List<OrderLineDto> orderLines;

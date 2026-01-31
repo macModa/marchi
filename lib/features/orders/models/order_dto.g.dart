@@ -9,10 +9,10 @@ part of 'order_dto.dart';
 OrderDto _$OrderDtoFromJson(Map<String, dynamic> json) => OrderDto(
   id: (json['id'] as num).toInt(),
   statut: $enumDecode(_$OrderStatusEnumMap, json['statut']),
-  total: (json['total'] as num).toDouble(),
+  total: (json['total'] as num?)?.toDouble() ?? 0.0,
   dateCreation: json['dateCreation'] as String,
   dateModification: json['dateModification'] as String,
-  clientId: (json['clientId'] as num).toInt(),
+  clientId: (json['clientId'] as num?)?.toInt() ?? 0,
   clientNom: json['clientNom'] as String,
   orderLines: (json['orderLines'] as List<dynamic>)
       .map((e) => OrderLineDto.fromJson(e as Map<String, dynamic>))
@@ -35,10 +35,10 @@ Map<String, dynamic> _$OrderDtoToJson(OrderDto instance) => <String, dynamic>{
 };
 
 const _$OrderStatusEnumMap = {
-  OrderStatus.en_attente: 'en_attente',
-  OrderStatus.confirmee: 'confirmee',
-  OrderStatus.en_cours: 'en_cours',
-  OrderStatus.expediee: 'expediee',
-  OrderStatus.livree: 'livree',
-  OrderStatus.annulee: 'annulee',
+  OrderStatus.pending: 'PENDING',
+  OrderStatus.confirmed: 'CONFIRMED',
+  OrderStatus.processing: 'PROCESSING',
+  OrderStatus.shipped: 'SHIPPED',
+  OrderStatus.delivered: 'DELIVERED',
+  OrderStatus.cancelled: 'CANCELLED',
 };

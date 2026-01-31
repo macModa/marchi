@@ -11,13 +11,13 @@ PagedResponse<T> _$PagedResponseFromJson<T>(
   T Function(Object? json) fromJsonT,
 ) => PagedResponse<T>(
   content: (json['content'] as List<dynamic>).map(fromJsonT).toList(),
-  page: (json['page'] as num).toInt(),
-  size: (json['size'] as num).toInt(),
-  totalPages: (json['totalPages'] as num).toInt(),
-  totalElements: (json['totalElements'] as num).toInt(),
-  first: json['first'] as bool,
-  last: json['last'] as bool,
-  empty: json['empty'] as bool,
+  page: (json['page'] as num?)?.toInt() ?? 0,
+  size: (json['size'] as num?)?.toInt() ?? 0,
+  totalPages: (json['totalPages'] as num?)?.toInt() ?? 0,
+  totalElements: (json['totalElements'] as num?)?.toInt() ?? 0,
+  first: json['first'] as bool? ?? true,
+  last: json['last'] as bool? ?? true,
+  empty: json['empty'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$PagedResponseToJson<T>(

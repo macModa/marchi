@@ -1,28 +1,42 @@
+import 'package:json_annotation/json_annotation.dart';
+
 enum OrderStatus {
-  en_attente('EN_ATTENTE'),
-  confirmee('CONFIRMEE'),
-  en_cours('EN_COURS'),
-  expediee('EXPEDIEE'),
-  livree('LIVREE'),
-  annulee('ANNULEE');
+  @JsonValue('PENDING')
+  pending('PENDING'),
+  @JsonValue('CONFIRMED')
+  confirmed('CONFIRMED'),
+  @JsonValue('PROCESSING')
+  processing('PROCESSING'),
+  @JsonValue('SHIPPED')
+  shipped('SHIPPED'),
+  @JsonValue('DELIVERED')
+  delivered('DELIVERED'),
+  @JsonValue('CANCELLED')
+  cancelled('CANCELLED');
 
   final String value;
   const OrderStatus(this.value);
 
   static OrderStatus fromString(String status) {
     switch (status.toUpperCase()) {
+      case 'PENDING':
       case 'EN_ATTENTE':
-        return OrderStatus.en_attente;
+        return OrderStatus.pending;
+      case 'CONFIRMED':
       case 'CONFIRMEE':
-        return OrderStatus.confirmee;
+        return OrderStatus.confirmed;
+      case 'PROCESSING':
       case 'EN_COURS':
-        return OrderStatus.en_cours;
+        return OrderStatus.processing;
+      case 'SHIPPED':
       case 'EXPEDIEE':
-        return OrderStatus.expediee;
+        return OrderStatus.shipped;
+      case 'DELIVERED':
       case 'LIVREE':
-        return OrderStatus.livree;
+        return OrderStatus.delivered;
+      case 'CANCELLED':
       case 'ANNULEE':
-        return OrderStatus.annulee;
+        return OrderStatus.cancelled;
       default:
         throw ArgumentError('Invalid order status: $status');
     }

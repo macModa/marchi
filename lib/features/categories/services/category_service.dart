@@ -34,4 +34,20 @@ class CategoryService {
       throw ErrorHandler.handleException(e);
     }
   }
+
+  Future<ApiResponse<CategoryDto>> createCategory(CategoryDto category) async {
+    try {
+      final response = await _dioClient.post(
+        ApiConstants.categories,
+        data: category.toJson(),
+      );
+
+      return ApiResponse<CategoryDto>.fromJson(
+        response.data as Map<String, dynamic>,
+        (json) => CategoryDto.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      throw ErrorHandler.handleException(e);
+    }
+  }
 }

@@ -12,6 +12,7 @@ import '../../features/products/screens/product_form_screen.dart';
 import '../../features/orders/screens/cart_screen.dart';
 import '../../features/orders/screens/checkout_screen.dart';
 import '../../features/orders/screens/orders_list_screen.dart';
+import '../../features/categories/screens/category_form_screen.dart';
 import '../../features/payments/screens/payment_screen.dart';
 import '../../features/auth/providers/auth_providers.dart';
 
@@ -82,6 +83,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           final id = int.parse(state.pathParameters['id']!);
           return ProductFormScreen(productId: id);
         },
+      ),
+      GoRoute(
+        path: '/admin/category/new',
+        builder: (context, state) => const CategoryFormScreen(),
       ),
     ],
     redirect: (context, state) {

@@ -84,27 +84,27 @@ class _StatusBadge extends StatelessWidget {
     String label;
 
     switch (status) {
-      case OrderStatus.en_attente:
+      case OrderStatus.pending:
         color = Colors.orange;
         label = 'En attente';
         break;
-      case OrderStatus.confirmee:
+      case OrderStatus.confirmed:
         color = Colors.blue;
         label = 'Confirmée';
         break;
-      case OrderStatus.en_cours:
+      case OrderStatus.processing:
         color = Colors.indigo;
         label = 'En cours';
         break;
-      case OrderStatus.expediee:
+      case OrderStatus.shipped:
         color = Colors.purple;
         label = 'Expédiée';
         break;
-      case OrderStatus.livree:
+      case OrderStatus.delivered:
         color = Colors.green;
         label = 'Livrée';
         break;
-      case OrderStatus.annulee:
+      case OrderStatus.cancelled:
         color = Colors.red;
         label = 'Annulée';
         break;

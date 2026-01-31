@@ -17,7 +17,7 @@ class PaymentScreen extends ConsumerStatefulWidget {
 }
 
 class _PaymentScreenState extends ConsumerState<PaymentScreen> {
-  PaymentMethod _selectedMethod = PaymentMethod.virement;
+  PaymentMethod _selectedMethod = PaymentMethod.bankTransfer;
   final _referenceController = TextEditingController();
   bool _isLoading = false;
 
@@ -107,7 +107,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             RadioListTile<PaymentMethod>(
               title: const Text('Virement Bancaire'),
               subtitle: const Text('Payez par transfert bancaire (RIB disponible après confirmation)'),
-              value: PaymentMethod.virement,
+              value: PaymentMethod.bankTransfer,
               groupValue: _selectedMethod,
               activeColor: Colors.brown[700],
               onChanged: (value) => setState(() => _selectedMethod = value!),
@@ -115,7 +115,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             RadioListTile<PaymentMethod>(
               title: const Text('Espèce'),
               subtitle: const Text('Paiement à la livraison'),
-              value: PaymentMethod.espece,
+              value: PaymentMethod.cash,
               groupValue: _selectedMethod,
               activeColor: Colors.brown[700],
               onChanged: (value) => setState(() => _selectedMethod = value!),
@@ -123,13 +123,13 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             RadioListTile<PaymentMethod>(
               title: const Text('Carte Bancaire'),
               subtitle: const Text('Cette option sera bientôt disponible'),
-              value: PaymentMethod.carte_bancaire,
+              value: PaymentMethod.card,
               groupValue: _selectedMethod,
               activeColor: Colors.brown[700],
               onChanged: null, // Disabled for now as per usual Tunisian MVP pattern
             ),
             const SizedBox(height: 24),
-            if (_selectedMethod == PaymentMethod.virement) ...[
+            if (_selectedMethod == PaymentMethod.bankTransfer) ...[
               const Text(
                 'Référence du virement (optionnel)',
                 style: TextStyle(fontWeight: FontWeight.bold),

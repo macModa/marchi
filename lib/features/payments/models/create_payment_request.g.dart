@@ -21,7 +21,8 @@ Map<String, dynamic> _$CreatePaymentRequestToJson(
 };
 
 const _$PaymentMethodEnumMap = {
-  PaymentMethod.carte_bancaire: 'carte_bancaire',
-  PaymentMethod.virement: 'virement',
-  PaymentMethod.espece: 'espece',
+  PaymentMethod.cash: 'CASH',
+  PaymentMethod.card: 'CARD',
+  PaymentMethod.mobileMoney: 'MOBILE_MONEY',
+  PaymentMethod.bankTransfer: 'BANK_TRANSFER',
 };

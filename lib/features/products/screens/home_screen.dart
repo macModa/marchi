@@ -82,6 +82,15 @@ class HomeScreen extends ConsumerWidget {
                   context.push('/artisan/products');
                 },
               ),
+            if (userRole == AppConstants.roleAdmin)
+              ListTile(
+                leading: const Icon(Icons.category),
+                title: const Text('Gérer les Catégories'),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.push('/admin/category/new');
+                },
+              ),
             const Spacer(),
             const Divider(),
             ListTile(
@@ -134,15 +143,28 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: userRole == AppConstants.roleArtisan
-          ? FloatingActionButton.extended(
-              onPressed: () => context.push('/artisan/product/new'),
-              label: const Text('Nouveau Produit'),
-              icon: const Icon(Icons.add),
-              backgroundColor: Colors.brown[700],
-              foregroundColor: Colors.white,
-            )
-          : null,
+      floatingActionButton: _buildFab(context, userRole),
     );
+  }
+
+  Widget? _buildFab(BuildContext context, String? userRole) {
+    if (userRole == AppConstants.roleArtisan) {
+      return FloatingActionButton.extended(
+        onPressed: () => context.push('/artisan/product/new'),
+        label: const Text('Nouveau Produit'),
+        icon: const Icon(Icons.add),
+        backgroundColor: Colors.brown[700],
+        foregroundColor: Colors.white,
+      );
+    } else if (userRole == AppConstants.roleAdmin) {
+      return FloatingActionButton.extended(
+        onPressed: () => context.push('/admin/category/new'),
+        label: const Text('Nouvelle Catégorie'),
+        icon: const Icon(Icons.category),
+        backgroundColor: Colors.brown[700],
+        foregroundColor: Colors.white,
+      );
+    }
+    return null;
   }
 }
