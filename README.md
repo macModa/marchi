@@ -128,3 +128,7 @@ flutter pub get
 flutter pub run build_runner build --delete-conflicting-outputs
 flutter run -d edge
 Intégration de la messagerie WhatsApp via URL Scheme permettant la communication directe client-artisan sans stockage intermédiaire côté serveur.
+
+
+
+La méthodologie Agile Scrum a été adoptée avec une organisation en 4 sprints de 2 semaines chacun, permettant une livraison incrémentale et une adaptation continue aux besoins.
