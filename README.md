@@ -3,6 +3,7 @@
 Marchi is a full-stack marketplace application designed to connect Tunisian artisans with clients. The platform enables artisans to showcase their handmade products, while clients can browse, search, and purchase unique artisanal items.
 
 ## Tech Stack
+Une méthode innovante de livraison via Colis Postal a été implémentée, basée sur une gestion structurée des codes postaux et des points relais. Cette approche améliore la logistique et optimise la distribution des produits artisanaux.
 
 ### Frontend
 - **Framework**: Flutter (Mobile)
