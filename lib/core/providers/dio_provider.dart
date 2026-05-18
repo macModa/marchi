@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import '../network/dio_client.dart';
 import '../storage/secure_storage.dart';
 
@@ -7,13 +8,10 @@ final secureStorageProvider = Provider<SecureStorage>((ref) {
 });
 
 final dioClientProvider = Provider<DioClient>((ref) {
-  final secureStorage = ref.watch(secureStorageProvider);
-  return DioClient(secureStorage);
+  return DioClient();
 });
 
-final dioProvider = Provider((ref) {
+final dioProvider = Provider<Dio>((ref) {
   final dioClient = ref.watch(dioClientProvider);
   return dioClient.dio;
 });
-
-

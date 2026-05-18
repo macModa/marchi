@@ -6,9 +6,21 @@ import '../../../core/models/paged_response.dart';
 
 final orderServiceProvider = Provider<OrderService>((ref) => OrderService());
 
-final myOrdersProvider = FutureProvider.family<PagedResponse<OrderDto>, ({int page, int size})>((ref, arg) async {
+// CLIENT: my orders with optional status filter
+final myOrdersProvider = FutureProvider.family<PagedResponse<OrderDto>, ({int page, int size, String? statut})>((ref, arg) async {
   final service = ref.watch(orderServiceProvider);
-  final response = await service.getMyOrders(page: arg.page, size: arg.size);
+  final response = await service.getMyOrders(statut: arg.statut, page: arg.page, size: arg.size);
+  if (response.success && response.data != null) {
+    return response.data!;
+  } else {
+    throw response.message;
+  }
+});
+
+// ARTISAN: orders containing artisan's products with optional status filter
+final artisanOrdersProvider = FutureProvider.family<PagedResponse<OrderDto>, ({int page, int size, String? statut})>((ref, arg) async {
+  final service = ref.watch(orderServiceProvider);
+  final response = await service.getArtisanOrders(statut: arg.statut, page: arg.page, size: arg.size);
   if (response.success && response.data != null) {
     return response.data!;
   } else {
@@ -29,6 +41,16 @@ final orderDetailProvider = FutureProvider.family<OrderDto, int>((ref, id) async
 final createOrderProvider = FutureProvider.family<OrderDto, CreateOrderRequest>((ref, request) async {
   final service = ref.watch(orderServiceProvider);
   final response = await service.createOrder(request);
+  if (response.success && response.data != null) {
+    return response.data!;
+  } else {
+    throw response.message;
+  }
+});
+// ADMIN: all orders with optional status filter
+final adminOrdersProvider = FutureProvider.family<PagedResponse<OrderDto>, ({int page, int size, String? statut})>((ref, arg) async {
+  final service = ref.watch(orderServiceProvider);
+  final response = await service.getAllOrdersAdmin(statut: arg.statut, page: arg.page, size: arg.size);
   if (response.success && response.data != null) {
     return response.data!;
   } else {

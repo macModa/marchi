@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../providers/product_providers.dart';
 import '../providers/product_search_provider.dart';
 import '../../../../shared/widgets/product_card.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -10,7 +9,8 @@ class ProductSearchScreen extends ConsumerStatefulWidget {
   const ProductSearchScreen({super.key});
 
   @override
-  ConsumerState<ProductSearchScreen> createState() => _ProductSearchScreenState();
+  ConsumerState<ProductSearchScreen> createState() =>
+      _ProductSearchScreenState();
 }
 
 class _ProductSearchScreenState extends ConsumerState<ProductSearchScreen> {
@@ -48,10 +48,7 @@ class _ProductSearchScreenState extends ConsumerState<ProductSearchScreen> {
           onSubmitted: (_) => _onSearch(),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: _onSearch,
-          ),
+          IconButton(icon: const Icon(Icons.search), onPressed: _onSearch),
           if (_query.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.clear),
@@ -93,7 +90,8 @@ class _ProductSearchScreenState extends ConsumerState<ProductSearchScreen> {
                   itemBuilder: (context, index) {
                     return ProductCard(
                       product: products[index],
-                      onTap: () => context.push('/product/${products[index].id}'),
+                      onTap: () =>
+                          context.push('/product/${products[index].id}'),
                     );
                   },
                 );

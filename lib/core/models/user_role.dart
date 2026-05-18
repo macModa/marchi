@@ -7,16 +7,11 @@ enum UserRole {
   const UserRole(this.value);
 
   static UserRole fromString(String role) {
-    switch (role.toUpperCase()) {
-      case 'CLIENT':
-        return UserRole.client;
-      case 'ARTISAN':
-        return UserRole.artisan;
-      case 'ADMIN':
-        return UserRole.admin;
-      default:
-        throw ArgumentError('Invalid role: $role');
-    }
+    final normalized = role.toUpperCase();
+    if (normalized.contains('ARTISAN')) return UserRole.artisan;
+    if (normalized.contains('CLIENT')) return UserRole.client;
+    if (normalized.contains('ADMIN')) return UserRole.admin;
+    throw ArgumentError('Invalid role: $role');
   }
 
   String toJson() => value;

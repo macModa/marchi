@@ -5,10 +5,9 @@ part 'create_order_request.g.dart';
 @JsonSerializable()
 class CreateOrderRequest {
   final List<OrderLineRequest> orderLines;
+  final String paymentMethod;
 
-  CreateOrderRequest({
-    required this.orderLines,
-  });
+  CreateOrderRequest({required this.orderLines, required this.paymentMethod});
 
   factory CreateOrderRequest.fromJson(Map<String, dynamic> json) =>
       _$CreateOrderRequestFromJson(json);
@@ -21,10 +20,7 @@ class OrderLineRequest {
   final int productId;
   final int quantite;
 
-  OrderLineRequest({
-    required this.productId,
-    required this.quantite,
-  });
+  OrderLineRequest({required this.productId, required this.quantite});
 
   factory OrderLineRequest.fromJson(Map<String, dynamic> json) =>
       _$OrderLineRequestFromJson(json);

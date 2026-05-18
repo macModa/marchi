@@ -63,15 +63,13 @@ class ErrorHandler {
     String message = AppConstants.errorGeneric;
     if (data is Map<String, dynamic>) {
       message = data['message'] as String? ?? message;
+    } else if (data is String && data.isNotEmpty) {
+      message = data;
     }
 
     switch (statusCode) {
       case 400:
-        return ValidationException(
-          message,
-          code: 'BAD_REQUEST',
-          details: data,
-        );
+        return ValidationException(message, code: 'BAD_REQUEST', details: data);
 
       case 401:
         return UnauthorizedException(
@@ -95,11 +93,7 @@ class ErrorHandler {
         );
 
       case 409:
-        return ValidationException(
-          message,
-          code: 'CONFLICT',
-          details: data,
-        );
+        return ValidationException(message, code: 'CONFLICT', details: data);
 
       case 422:
         return ValidationException(

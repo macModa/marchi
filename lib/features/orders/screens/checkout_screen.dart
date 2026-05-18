@@ -15,6 +15,7 @@ class CheckoutScreen extends ConsumerStatefulWidget {
 
 class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _isLoading = false;
+  final String _selectedPaymentMethod = 'ONLINE';
 
   Future<void> _placeOrder() async {
     final cart = ref.read(cartProvider);
@@ -24,36 +25,47 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     try {
       final orderLines = cart.items
-          .map((item) => OrderLineRequest(
-                productId: item.product.id!,
-                quantite: item.quantity,
-              ))
+          .map(
+            (item) => OrderLineRequest(
+              productId: item.product.id!,
+              quantite: item.quantity,
+            ),
+          )
           .toList();
 
-      final request = CreateOrderRequest(orderLines: orderLines);
-      
-      final response = await ref.read(orderServiceProvider).createOrder(request);
+      final request = CreateOrderRequest(
+        orderLines: orderLines,
+        paymentMethod: _selectedPaymentMethod,
+      );
+
+      final response = await ref
+          .read(orderServiceProvider)
+          .createOrder(request);
 
       if (response.success && response.data != null) {
         // Clear cart after successful order
         ref.read(cartProvider.notifier).clearCart();
-        
-        // Navigate to payment screen with order ID
+
+        // Navigate to payment screen or order details
         if (mounted) {
-          context.pushReplacement('/payment/${response.data!.id}');
+          if (_selectedPaymentMethod == 'CASH_ON_DELIVERY') {
+            context.pushReplacement('/orders/${response.data!.id}');
+          } else {
+            context.pushReplacement('/payment/${response.data!.id}');
+          }
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(response.message)));
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
       }
     } finally {
       if (mounted) {
@@ -67,9 +79,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final cart = ref.watch(cartProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Validation de commande'),
-      ),
+      appBar: AppBar(title: const Text('Validation de commande')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
         child: Column(
@@ -77,11 +87,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           children: [
             Text(
               'Récapitulatif',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             Card(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -104,7 +118,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Sous-total', style: TextStyle(fontSize: 16)),
-                Text('${cart.total.toStringAsFixed(2)} TND', style: const TextStyle(fontSize: 16)),
+                Text(
+                  '${cart.total.toStringAsFixed(2)} TND',
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
             const SizedBox(height: 8),
@@ -112,7 +129,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Frais de livraison', style: TextStyle(fontSize: 16)),
-                Text('Gratuit', style: TextStyle(fontSize: 16, color: Colors.green, fontWeight: FontWeight.bold)),
+                Text(
+                  'Gratuit',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -144,14 +168,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   backgroundColor: Colors.brown[700],
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadius,
+                    ),
                   ),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         'Confirmer la commande',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
               ),
             ),

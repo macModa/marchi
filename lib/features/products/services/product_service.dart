@@ -150,7 +150,10 @@ class ProductService {
     }
   }
 
-  Future<ApiResponse<ProductDto>> updateProduct(int id, ProductDto product) async {
+  Future<ApiResponse<ProductDto>> updateProduct(
+    int id,
+    ProductDto product,
+  ) async {
     try {
       final response = await _dioClient.put(
         ApiConstants.productById(id),
@@ -172,7 +175,7 @@ class ProductService {
 
       return ApiResponse<void>.fromJson(
         response.data as Map<String, dynamic>,
-        (json) => null,
+        (json) {},
       );
     } catch (e) {
       throw ErrorHandler.handleException(e);

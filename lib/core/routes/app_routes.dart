@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -15,6 +14,8 @@ import '../../features/orders/screens/orders_list_screen.dart';
 import '../../features/categories/screens/category_form_screen.dart';
 import '../../features/payments/screens/payment_screen.dart';
 import '../../features/auth/providers/auth_providers.dart';
+import '../../features/admin/screens/admin_dashboard_screen.dart';
+import '../../features/orders/screens/admin_orders_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateProvider);
@@ -88,6 +89,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/category/new',
         builder: (context, state) => const CategoryFormScreen(),
       ),
+      GoRoute(
+        path: '/admin',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin/orders',
+        builder: (context, state) => const AdminOrdersScreen(),
+      ),
     ],
     redirect: (context, state) {
       // Get the current auth state
@@ -98,6 +107,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthenticated = authValue.maybeWhen(
         data: (auth) => auth != null,
         orElse: () => false,
+      );
+
+      final userRole = authValue.maybeWhen(
+        data: (auth) => auth?.role,
+        orElse: () => null,
       );
 
       final isLoggingIn = state.matchedLocation == '/login';
@@ -111,6 +125,12 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       if (isAuthenticated && (isLoggingIn || isRegistering || isSplash)) {
         return '/home';
+      }
+
+      if (isAuthenticated && state.matchedLocation.startsWith('/admin')) {
+        if (userRole?.toUpperCase() != 'ADMIN') {
+          return '/home';
+        }
       }
 
       return null;

@@ -7,23 +7,15 @@ import '../storage/secure_storage.dart';
 class DioClient {
   static final DioClient _instance = DioClient._internal();
   factory DioClient() => _instance;
-  DioClient._internal();
 
-  late final Dio _dio;
-  final Logger _logger = Logger();
-
-  Dio get dio => _dio;
-
-  void initialize() {
+  DioClient._internal() {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
         connectTimeout: ApiConstants.connectTimeout,
         receiveTimeout: ApiConstants.receiveTimeout,
         sendTimeout: ApiConstants.sendTimeout,
-        headers: {
-          ApiConstants.contentTypeHeader: ApiConstants.contentTypeJson,
-        },
+        headers: {ApiConstants.contentTypeHeader: ApiConstants.contentTypeJson},
         validateStatus: (status) {
           // Accept all status codes to handle errors manually
           return status != null && status < 500;
@@ -33,7 +25,26 @@ class DioClient {
 
     // Add interceptors
     _dio.interceptors.add(AuthInterceptor(SecureStorage()));
-    
+
+    // Global response validator interceptor
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onResponse: (response, handler) {
+          if (response.statusCode != null && response.statusCode! >= 400) {
+            handler.reject(
+              DioException(
+                requestOptions: response.requestOptions,
+                response: response,
+                type: DioExceptionType.badResponse,
+              ),
+            );
+          } else {
+            handler.next(response);
+          }
+        },
+      ),
+    );
+
     // Add logging interceptor in debug mode
     _dio.interceptors.add(
       LogInterceptor(
@@ -47,14 +58,19 @@ class DioClient {
     );
   }
 
+  late final Dio _dio;
+  final Logger _logger = Logger();
+
+  Dio get dio => _dio;
+
   // GET request
-  Future<Response> get(
+  Future<Response<T>> get<T>(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      return await _dio.get(
+      return await _dio.get<T>(
         path,
         queryParameters: queryParameters,
         options: options,
@@ -66,14 +82,14 @@ class DioClient {
   }
 
   // POST request
-  Future<Response> post(
+  Future<Response<T>> post<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      return await _dio.post(
+      return await _dio.post<T>(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -86,14 +102,14 @@ class DioClient {
   }
 
   // PUT request
-  Future<Response> put(
+  Future<Response<T>> put<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      return await _dio.put(
+      return await _dio.put<T>(
         path,
         data: data,
         queryParameters: queryParameters,
@@ -106,14 +122,14 @@ class DioClient {
   }
 
   // DELETE request
-  Future<Response> delete(
+  Future<Response<T>> delete<T>(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
   }) async {
     try {
-      return await _dio.delete(
+      return await _dio.delete<T>(
         path,
         data: data,
         queryParameters: queryParameters,

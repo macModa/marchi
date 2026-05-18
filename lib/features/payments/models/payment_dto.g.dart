@@ -8,8 +8,9 @@ part of 'payment_dto.dart';
 
 PaymentDto _$PaymentDtoFromJson(Map<String, dynamic> json) => PaymentDto(
   id: (json['id'] as num?)?.toInt(),
-  methode: $enumDecode(_$PaymentMethodEnumMap, json['methode']),
-  statut: $enumDecode(_$PaymentStatusEnumMap, json['statut']),
+  montant: (json['montant'] as num?)?.toDouble(),
+  methode: paymentMethodFromString(json['methode'] as String),
+  statut: paymentStatusFromString(json['statut'] as String),
   reference: json['reference'] as String?,
   dateCreation: json['dateCreation'] as String?,
   dateModification: json['dateModification'] as String?,
@@ -19,24 +20,11 @@ PaymentDto _$PaymentDtoFromJson(Map<String, dynamic> json) => PaymentDto(
 Map<String, dynamic> _$PaymentDtoToJson(PaymentDto instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'methode': instance.methode,
-      'statut': instance.statut,
+      'montant': instance.montant,
+      'methode': paymentMethodToString(instance.methode),
+      'statut': paymentStatusToString(instance.statut),
       'reference': instance.reference,
       'dateCreation': instance.dateCreation,
       'dateModification': instance.dateModification,
       'orderId': instance.orderId,
     };
-
-const _$PaymentMethodEnumMap = {
-  PaymentMethod.cash: 'CASH',
-  PaymentMethod.card: 'CARD',
-  PaymentMethod.mobileMoney: 'MOBILE_MONEY',
-  PaymentMethod.bankTransfer: 'BANK_TRANSFER',
-};
-
-const _$PaymentStatusEnumMap = {
-  PaymentStatus.pending: 'PENDING',
-  PaymentStatus.completed: 'COMPLETED',
-  PaymentStatus.failed: 'FAILED',
-  PaymentStatus.refunded: 'REFUNDED',
-};

@@ -1,11 +1,18 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../core/services/cloudinary_service.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../auth/providers/auth_providers.dart';
+import '../../categories/providers/category_providers.dart';
+import '../models/product_dto.dart';
 import '../providers/product_providers.dart';
 import '../providers/product_service_provider.dart';
-import '../models/product_dto.dart';
-import '../../categories/providers/category_providers.dart';
-import '../../../../core/constants/app_constants.dart';
 
 class ProductFormScreen extends ConsumerStatefulWidget {
   final int? productId;
@@ -24,6 +31,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   final _stockController = TextEditingController();
   int? _selectedCategoryId;
   bool _isLoading = false;
+  XFile? _selectedImage;
+  Uint8List? _webImageBytes;
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -34,7 +44,28 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
   }
 
   Future<void> _loadProductData() async {
-    // In a real app, you'd fetch the product details and populate the controllers
+    setState(() => _isLoading = true);
+    try {
+      final product = await ref.read(
+        productDetailProvider(widget.productId!).future,
+      );
+      _nomController.text = product.nom;
+      _descriptionController.text = product.description ?? '';
+      _prixController.text = product.prix.toString();
+      _stockController.text = product.stock.toString();
+      _selectedCategoryId = product.categoryId;
+      _imageUrl = product.imageUrl;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur lors du chargement: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -44,6 +75,25 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     _prixController.dispose();
     _stockController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
+    if (image != null) {
+      Uint8List? webBytes;
+      if (kIsWeb) {
+        webBytes = await image.readAsBytes();
+      }
+      setState(() {
+        _selectedImage = image;
+        _webImageBytes = webBytes;
+      });
+    }
   }
 
   Future<void> _saveProduct() async {
@@ -58,6 +108,67 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     setState(() => _isLoading = true);
 
     try {
+      final authData = ref.read(authStateProvider).value;
+      if (authData == null) {
+        throw 'Utilisateur non authentifié';
+      }
+
+      String? imageUrl = _imageUrl;
+
+      // 1. Upload image FIRST if a new one is selected
+      if (_selectedImage != null) {
+        debugPrint('[ProductForm] Starting image upload...');
+        debugPrint('[ProductForm] Image path: ${_selectedImage!.path}');
+        debugPrint('[ProductForm] Image name: ${_selectedImage!.name}');
+
+        if (kIsWeb) {
+          final bytes = await _selectedImage!.readAsBytes();
+          debugPrint('[ProductForm] Web image bytes length: ${bytes.length}');
+          final uploadUrl = await CloudinaryService.uploadImageBytes(
+            bytes,
+            _selectedImage!.name,
+          );
+          debugPrint('[ProductForm] Cloudinary upload result: $uploadUrl');
+          if (uploadUrl != null && uploadUrl.isNotEmpty) {
+            imageUrl = uploadUrl;
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Échec de l'upload de l'image sur Cloudinary"),
+                ),
+              );
+            }
+            setState(() => _isLoading = false);
+            return;
+          }
+        } else {
+          final file = File(_selectedImage!.path);
+          debugPrint('[ProductForm] Mobile file path: ${file.path}');
+          debugPrint('[ProductForm] File exists: ${await file.exists()}');
+          final uploadUrl = await CloudinaryService.uploadImage(file);
+          debugPrint('[ProductForm] Cloudinary upload result: $uploadUrl');
+          if (uploadUrl != null && uploadUrl.isNotEmpty) {
+            imageUrl = uploadUrl;
+          } else {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Échec de l'upload de l'image sur Cloudinary"),
+                ),
+              );
+            }
+            setState(() => _isLoading = false);
+            return;
+          }
+        }
+
+        debugPrint('[ProductForm] Final imageUrl after upload: $imageUrl');
+      } else {
+        debugPrint('[ProductForm] No new image selected, using existing: $imageUrl');
+      }
+
+      // 2. Create ProductDto WITH the imageUrl
       final product = ProductDto(
         id: widget.productId,
         nom: _nomController.text.trim(),
@@ -65,16 +176,29 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         prix: double.parse(_prixController.text.trim()),
         stock: int.parse(_stockController.text.trim()),
         categoryId: _selectedCategoryId!,
-        artisanId: 0, // Should be the current user's ID
+        artisanId: authData.userId,
+        imageUrl: imageUrl,
       );
+
+      // Debug: Print the JSON payload being sent
+      final payload = product.toJson();
+      debugPrint('[ProductForm] Sending payload: ${jsonEncode(payload)}');
+      debugPrint('[ProductForm] imageUrl in payload: ${payload['imageUrl']}');
 
       bool success;
       if (widget.productId == null) {
-        final response = await ref.read(productServiceProvider).createProduct(product);
+        final response = await ref
+            .read(productServiceProvider)
+            .createProduct(product);
         success = response.success;
+        debugPrint('[ProductForm] Create response success: $success');
+        debugPrint('[ProductForm] Create response data: ${response.data}');
       } else {
-        final response = await ref.read(productServiceProvider).updateProduct(widget.productId!, product);
+        final response = await ref
+            .read(productServiceProvider)
+            .updateProduct(widget.productId!, product);
         success = response.success;
+        debugPrint('[ProductForm] Update response success: $success');
       }
 
       if (success) {
@@ -86,10 +210,11 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
         }
       }
     } catch (e) {
+      debugPrint('[ProductForm] Error saving product: $e');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
       }
     } finally {
       if (mounted) {
@@ -104,7 +229,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.productId == null ? 'Nouveau Produit' : 'Modifier Produit'),
+        title: Text(
+          widget.productId == null ? 'Nouveau Produit' : 'Modifier Produit',
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
@@ -113,15 +240,80 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Image Section
+              Center(
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.borderRadius,
+                      ),
+                      border: Border.all(color: Colors.brown.withOpacity(0.3)),
+                    ),
+                    child: _selectedImage != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppConstants.borderRadius,
+                            ),
+                            child: kIsWeb
+                                ? (_webImageBytes != null
+                                    ? Image.memory(
+                                        _webImageBytes!,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : const Center(
+                                        child: CircularProgressIndicator(),
+                                      ))
+                                : Image.file(
+                                    File(_selectedImage!.path),
+                                    fit: BoxFit.cover,
+                                  ),
+                          )
+                        : (_imageUrl != null && _imageUrl!.isNotEmpty)
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              AppConstants.borderRadius,
+                            ),
+                            child: Image.network(_imageUrl!, fit: BoxFit.cover),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add_a_photo_outlined,
+                                size: 40,
+                                color: Colors.brown[300],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Ajouter une image',
+                                style: TextStyle(
+                                  color: Colors.brown[300],
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _nomController,
                 decoration: InputDecoration(
                   labelText: 'Nom du produit',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadius,
+                    ),
                   ),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Champ requis' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Champ requis' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -130,11 +322,14 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                   labelText: 'Description',
                   alignLabelWithHint: true,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadius,
+                    ),
                   ),
                 ),
                 maxLines: 4,
-                validator: (value) => value == null || value.isEmpty ? 'Champ requis' : null,
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Champ requis' : null,
               ),
               const SizedBox(height: 16),
               Row(
@@ -145,13 +340,19 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                       decoration: InputDecoration(
                         labelText: 'Prix (TND)',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                          borderRadius: BorderRadius.circular(
+                            AppConstants.borderRadius,
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Champ requis';
-                        if (double.tryParse(value) == null) return 'Prix invalide';
+                        if (value == null || value.isEmpty) {
+                          return 'Champ requis';
+                        }
+                        if (double.tryParse(value) == null) {
+                          return 'Prix invalide';
+                        }
                         return null;
                       },
                     ),
@@ -163,13 +364,19 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                       decoration: InputDecoration(
                         labelText: 'Stock',
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                          borderRadius: BorderRadius.circular(
+                            AppConstants.borderRadius,
+                          ),
                         ),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Champ requis';
-                        if (int.tryParse(value) == null) return 'Stock invalide';
+                        if (value == null || value.isEmpty) {
+                          return 'Champ requis';
+                        }
+                        if (int.tryParse(value) == null) {
+                          return 'Stock invalide';
+                        }
                         return null;
                       },
                     ),
@@ -179,11 +386,13 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
               const SizedBox(height: 16),
               categoriesAsync.when(
                 data: (categories) => DropdownButtonFormField<int>(
-                  value: _selectedCategoryId,
+                  initialValue: _selectedCategoryId,
                   decoration: InputDecoration(
                     labelText: 'Catégorie',
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.borderRadius,
+                      ),
                     ),
                   ),
                   items: categories.map((cat) {
@@ -192,7 +401,8 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                       child: Text(cat.nom),
                     );
                   }).toList(),
-                  onChanged: (value) => setState(() => _selectedCategoryId = value),
+                  onChanged: (value) =>
+                      setState(() => _selectedCategoryId = value),
                 ),
                 loading: () => const CircularProgressIndicator(),
                 error: (err, stack) => Text('Erreur catégories: $err'),
@@ -206,14 +416,19 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                     backgroundColor: Colors.brown[700],
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.borderRadius,
+                      ),
                     ),
                   ),
                   child: _isLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
                           'Enregistrer le Produit',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                 ),
               ),

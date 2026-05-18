@@ -9,20 +9,13 @@ part of 'create_payment_request.dart';
 CreatePaymentRequest _$CreatePaymentRequestFromJson(
   Map<String, dynamic> json,
 ) => CreatePaymentRequest(
-  methode: $enumDecode(_$PaymentMethodEnumMap, json['methode']),
+  methode: paymentMethodFromString(json['methode'] as String),
   reference: json['reference'] as String?,
 );
 
 Map<String, dynamic> _$CreatePaymentRequestToJson(
   CreatePaymentRequest instance,
 ) => <String, dynamic>{
-  'methode': instance.methode,
+  'methode': paymentMethodToString(instance.methode),
   'reference': instance.reference,
-};
-
-const _$PaymentMethodEnumMap = {
-  PaymentMethod.cash: 'CASH',
-  PaymentMethod.card: 'CARD',
-  PaymentMethod.mobileMoney: 'MOBILE_MONEY',
-  PaymentMethod.bankTransfer: 'BANK_TRANSFER',
 };

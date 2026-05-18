@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/payment_method.dart';
 import '../models/create_payment_request.dart';
-import '../services/payment_service.dart';
-import '../providers/payment_service_provider.dart';
+import '../providers/payment_providers.dart';
 import '../../../../core/constants/app_constants.dart';
 
 class PaymentScreen extends ConsumerStatefulWidget {
@@ -33,10 +32,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     try {
       final request = CreatePaymentRequest(
         methode: _selectedMethod,
-        reference: _referenceController.text.trim().isEmpty ? null : _referenceController.text.trim(),
+        reference: _referenceController.text.trim().isEmpty
+            ? null
+            : _referenceController.text.trim(),
       );
 
-      final response = await ref.read(paymentServiceProvider).createPayment(widget.orderId, request);
+      final response = await ref
+          .read(paymentServiceProvider)
+          .createPayment(widget.orderId, request);
 
       if (response.success) {
         if (mounted) {
@@ -44,7 +47,11 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             context: context,
             barrierDismissible: false,
             builder: (context) => AlertDialog(
-              title: const Icon(Icons.check_circle, color: Colors.green, size: 60),
+              title: const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+                size: 60,
+              ),
               content: const Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -70,16 +77,16 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(response.message)));
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
       }
     } finally {
       if (mounted) {
@@ -91,9 +98,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Paiement'),
-      ),
+      appBar: AppBar(title: const Text('Paiement')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.defaultPadding),
         child: Column(
@@ -101,12 +106,16 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           children: [
             Text(
               'Choisir une méthode de paiement',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 24),
             RadioListTile<PaymentMethod>(
               title: const Text('Virement Bancaire'),
-              subtitle: const Text('Payez par transfert bancaire (RIB disponible après confirmation)'),
+              subtitle: const Text(
+                'Payez par transfert bancaire (RIB disponible après confirmation)',
+              ),
               value: PaymentMethod.bankTransfer,
               groupValue: _selectedMethod,
               activeColor: Colors.brown[700],
@@ -126,7 +135,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
               value: PaymentMethod.card,
               groupValue: _selectedMethod,
               activeColor: Colors.brown[700],
-              onChanged: null, // Disabled for now as per usual Tunisian MVP pattern
+              onChanged:
+                  null, // Disabled for now as per usual Tunisian MVP pattern
             ),
             const SizedBox(height: 24),
             if (_selectedMethod == PaymentMethod.bankTransfer) ...[
@@ -140,7 +150,9 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 decoration: InputDecoration(
                   hintText: 'Ex: VIR-123456',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadius,
+                    ),
                   ),
                 ),
               ),
@@ -173,14 +185,19 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                   backgroundColor: Colors.brown[700],
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                    borderRadius: BorderRadius.circular(
+                      AppConstants.borderRadius,
+                    ),
                   ),
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text(
                         'Valider le paiement',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
               ),
             ),

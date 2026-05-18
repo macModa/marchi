@@ -15,27 +15,43 @@ class MyApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        scaffoldBackgroundColor: const Color(AppConstants.colorBackground),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.brown,
-          primary: Colors.brown[700],
-          secondary: Colors.orange[800],
-          surface: const Color(0xFFFDF8F5),
+          seedColor: const Color(AppConstants.colorPrimary),
+          primary: const Color(AppConstants.colorPrimary),
+          secondary: const Color(AppConstants.colorSecondary),
+          surface: const Color(AppConstants.colorBackground),
+          onSurface: const Color(AppConstants.colorTextPrimary),
         ),
-        textTheme: ThemeData.light().textTheme.apply(
-              displayColor: Colors.brown[900],
-              bodyColor: Colors.brown[800],
-            ),
+        textTheme: ThemeData.light().textTheme.copyWith(
+          displayLarge: TextStyle(color: const Color(AppConstants.colorTextPrimary), fontWeight: FontWeight.bold),
+          displayMedium: TextStyle(color: const Color(AppConstants.colorTextPrimary), fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(color: const Color(AppConstants.colorTextPrimary)),
+          bodyMedium: TextStyle(color: const Color(AppConstants.colorTextSecondary)),
+        ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white,
+          fillColor: Colors.white.withOpacity(0.8),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding,
+            vertical: AppConstants.defaultPadding,
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(AppConstants.colorPrimary),
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.largePadding,
+              vertical: AppConstants.defaultPadding,
+            ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
             ),
           ),
         ),

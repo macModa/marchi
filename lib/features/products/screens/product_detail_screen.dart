@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/product_providers.dart';
+import '../providers/product_service_provider.dart';
+import '../../auth/providers/auth_providers.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../../shared/providers/cart_provider.dart';
+import '../../../../shared/widgets/whatsapp_button.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   final int productId;
@@ -17,15 +20,42 @@ class ProductDetailScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détails du Produit'),
+        title: Text(productAsync.value?.nom ?? 'Détails du Produit'),
         actions: [
-          IconButton(
-            icon: Badge(
-              label: Text('${ref.watch(cartProvider).itemCount}'),
-              isLabelVisible: !ref.watch(cartProvider).isEmpty,
-              child: const Icon(Icons.shopping_cart_outlined),
-            ),
-            onPressed: () => context.push('/cart'),
+          productAsync.maybeWhen(
+            data: (product) {
+              final user = ref.watch(authStateProvider).value;
+              final isOwner =
+                  user != null &&
+                  product.artisanId != null &&
+                  product.artisanId == user.userId;
+
+              if (isOwner) {
+                return Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        context.push(
+                          '/artisan/product/edit/${product.id}',
+                          extra: product,
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () =>
+                          _confirmDelete(context, ref, product.id!),
+                    ),
+                  ],
+                );
+              }
+              return IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () => context.push('/cart'),
+              );
+            },
+            orElse: () => const SizedBox.shrink(),
           ),
         ],
       ),
@@ -36,7 +66,10 @@ class ProductDetailScreen extends ConsumerWidget {
             children: [
               // Product Image
               CachedNetworkImage(
-                imageUrl: AppConstants.placeholderImage,
+                imageUrl:
+                    (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+                    ? product.imageUrl!
+                    : AppConstants.placeholderImage,
                 height: 300,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -57,7 +90,8 @@ class ProductDetailScreen extends ConsumerWidget {
                         Expanded(
                           child: Text(
                             product.nom,
-                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.brown[900],
                                 ),
@@ -65,7 +99,8 @@ class ProductDetailScreen extends ConsumerWidget {
                         ),
                         Text(
                           '${product.prix.toStringAsFixed(2)} TND',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.brown[700],
                               ),
@@ -82,27 +117,33 @@ class ProductDetailScreen extends ConsumerWidget {
                     Text(
                       'Description',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       product.description ?? 'Aucune description disponible.',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Colors.grey[800],
-                            height: 1.5,
-                          ),
+                        color: Colors.grey[800],
+                        height: 1.5,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     const Divider(),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Icon(Icons.storefront_outlined, color: Colors.brown),
+                        const Icon(
+                          Icons.storefront_outlined,
+                          color: Colors.brown,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Artisan: ',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600],
+                          ),
                         ),
                         Text(
                           product.artisanNom ?? 'Inconnu',
@@ -113,20 +154,35 @@ class ProductDetailScreen extends ConsumerWidget {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Icon(Icons.inventory_2_outlined, color: Colors.brown),
+                        const Icon(
+                          Icons.inventory_2_outlined,
+                          color: Colors.brown,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Stock: ',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey[600],
+                          ),
                         ),
                         Text(
                           '${product.stock} unités',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: product.stock > 0 ? Colors.green[700] : Colors.red[700],
+                            color: product.stock > 0
+                                ? Colors.green[700]
+                                : Colors.red[700],
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 24),
+                    WhatsAppButton(
+                      phone:
+                          '21650123456', // TODO: Remplacer par product.artisan.phone
+                      message:
+                          "Bonjour, je suis intéressé par votre produit ${product.nom}",
                     ),
                     const SizedBox(height: 100), // Space for bottom button
                   ],
@@ -167,7 +223,9 @@ class ProductDetailScreen extends ConsumerWidget {
                     backgroundColor: Colors.brown[700],
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppConstants.borderRadius),
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.borderRadius,
+                      ),
                     ),
                   ),
                   icon: const Icon(Icons.add_shopping_cart),
@@ -180,6 +238,45 @@ class ProductDetailScreen extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, WidgetRef ref, int productId) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Supprimer le produit"),
+        content: const Text("Cette action est irréversible."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Annuler"),
+          ),
+          TextButton(
+            onPressed: () async {
+              try {
+                final response = await ref
+                    .read(productServiceProvider)
+                    .deleteProduct(productId);
+                if (response.success && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Produit supprimé')),
+                  );
+                  Navigator.pop(context); // Close dialog
+                  Navigator.pop(context); // Go back
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+                }
+              }
+            },
+            child: const Text("Supprimer", style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

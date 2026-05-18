@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/error/error_handler.dart';
 import '../../../core/models/api_response.dart';

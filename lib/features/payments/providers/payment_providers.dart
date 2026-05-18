@@ -16,17 +16,9 @@ class PaymentState {
   final bool isLoading;
   final String? error;
 
-  PaymentState({
-    this.payment,
-    this.isLoading = false,
-    this.error,
-  });
+  PaymentState({this.payment, this.isLoading = false, this.error});
 
-  PaymentState copyWith({
-    PaymentDto? payment,
-    bool? isLoading,
-    String? error,
-  }) {
+  PaymentState copyWith({PaymentDto? payment, bool? isLoading, String? error}) {
     return PaymentState(
       payment: payment ?? this.payment,
       isLoading: isLoading ?? this.isLoading,
@@ -40,17 +32,24 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
 
   PaymentNotifier(this._paymentService) : super(PaymentState());
 
-  Future<PaymentDto?> createPayment(int orderId, CreatePaymentRequest request) async {
+  Future<PaymentDto?> createPayment(
+    int orderId,
+    CreatePaymentRequest request,
+  ) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final payment = await _paymentService.createPayment(orderId, request);
+      final response = await _paymentService.createPayment(orderId, request);
+      final payment = response.data;
       state = state.copyWith(isLoading: false, payment: payment);
       return payment;
     } on AppException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
       return null;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Une erreur est survenue');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Une erreur est survenue',
+      );
       return null;
     }
   }
@@ -58,18 +57,23 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
   Future<void> loadPaymentByOrder(int orderId) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final payment = await _paymentService.getPaymentByOrder(orderId);
+      final response = await _paymentService.getPaymentByOrderId(orderId);
+      final payment = response.data;
       state = state.copyWith(isLoading: false, payment: payment);
     } on AppException catch (e) {
       state = state.copyWith(isLoading: false, error: e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: 'Une erreur est survenue');
+      state = state.copyWith(
+        isLoading: false,
+        error: 'Une erreur est survenue',
+      );
     }
   }
 }
 
-final paymentProvider = StateNotifierProvider<PaymentNotifier, PaymentState>((ref) {
+final paymentProvider = StateNotifierProvider<PaymentNotifier, PaymentState>((
+  ref,
+) {
   final paymentService = ref.watch(paymentServiceProvider);
   return PaymentNotifier(paymentService);
 });
-

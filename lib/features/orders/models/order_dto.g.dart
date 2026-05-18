@@ -8,7 +8,7 @@ part of 'order_dto.dart';
 
 OrderDto _$OrderDtoFromJson(Map<String, dynamic> json) => OrderDto(
   id: (json['id'] as num).toInt(),
-  statut: $enumDecode(_$OrderStatusEnumMap, json['statut']),
+  statut: orderStatusFromString(json['statut'] as String?),
   total: (json['total'] as num?)?.toDouble() ?? 0.0,
   dateCreation: json['dateCreation'] as String,
   dateModification: json['dateModification'] as String,
@@ -20,11 +20,15 @@ OrderDto _$OrderDtoFromJson(Map<String, dynamic> json) => OrderDto(
   payment: json['payment'] == null
       ? null
       : PaymentDto.fromJson(json['payment'] as Map<String, dynamic>),
+  paymentMethod: json['paymentMethod'] as String?,
+  paymentStatus: json['paymentStatus'] as String?,
+  deliveryToken: json['deliveryToken'] as String?,
+  trackingNumber: json['trackingNumber'] as String?,
 );
 
 Map<String, dynamic> _$OrderDtoToJson(OrderDto instance) => <String, dynamic>{
   'id': instance.id,
-  'statut': instance.statut,
+  'statut': orderStatusToString(instance.statut),
   'total': instance.total,
   'dateCreation': instance.dateCreation,
   'dateModification': instance.dateModification,
@@ -32,13 +36,8 @@ Map<String, dynamic> _$OrderDtoToJson(OrderDto instance) => <String, dynamic>{
   'clientNom': instance.clientNom,
   'orderLines': instance.orderLines,
   'payment': instance.payment,
-};
-
-const _$OrderStatusEnumMap = {
-  OrderStatus.pending: 'PENDING',
-  OrderStatus.confirmed: 'CONFIRMED',
-  OrderStatus.processing: 'PROCESSING',
-  OrderStatus.shipped: 'SHIPPED',
-  OrderStatus.delivered: 'DELIVERED',
-  OrderStatus.cancelled: 'CANCELLED',
+  'paymentMethod': instance.paymentMethod,
+  'paymentStatus': instance.paymentStatus,
+  'deliveryToken': instance.deliveryToken,
+  'trackingNumber': instance.trackingNumber,
 };

@@ -1,35 +1,43 @@
-import 'package:json_annotation/json_annotation.dart';
-
+/// Payment method enum synchronized with Spring Boot backend
 enum PaymentMethod {
-  @JsonValue('CASH')
-  cash('CASH'),
-  @JsonValue('CARD')
-  card('CARD'),
-  @JsonValue('MOBILE_MONEY')
-  mobileMoney('MOBILE_MONEY'),
-  @JsonValue('BANK_TRANSFER')
-  bankTransfer('BANK_TRANSFER');
+  card,
+  mobileMoney,
+  bankTransfer,
+  cash,
+}
 
-  final String value;
-  const PaymentMethod(this.value);
-
-  static PaymentMethod fromString(String method) {
-    switch (method.toUpperCase()) {
-      case 'CASH':
-      case 'ESPECE':
-        return PaymentMethod.cash;
-      case 'CARD':
-      case 'CARTE_BANCAIRE':
-        return PaymentMethod.card;
-      case 'MOBILE_MONEY':
-        return PaymentMethod.mobileMoney;
-      case 'BANK_TRANSFER':
-      case 'VIREMENT':
-        return PaymentMethod.bankTransfer;
-      default:
-        throw ArgumentError('Invalid payment method: $method');
-    }
+/// 🔄 Mapper: Backend String → Flutter Enum
+/// Converts backend UPPERCASE values to Flutter enum
+PaymentMethod paymentMethodFromString(String value) {
+  switch (value.toUpperCase()) {
+    case 'CARD':
+    case 'CARTE_BANCAIRE': // Legacy support
+      return PaymentMethod.card;
+    case 'MOBILE_MONEY':
+      return PaymentMethod.mobileMoney;
+    case 'BANK_TRANSFER':
+    case 'VIREMENT': // Legacy support
+      return PaymentMethod.bankTransfer;
+    case 'CASH':
+    case 'ESPECE': // Legacy support
+      return PaymentMethod.cash;
+    default:
+      // Fallback to cash instead of throwing to prevent crashes
+      return PaymentMethod.cash;
   }
+}
 
-  String toJson() => value;
+/// 🔄 Mapper: Flutter Enum → Backend String
+/// Converts Flutter enum to backend UPPERCASE values
+String paymentMethodToString(PaymentMethod method) {
+  switch (method) {
+    case PaymentMethod.card:
+      return 'CARD';
+    case PaymentMethod.mobileMoney:
+      return 'MOBILE_MONEY';
+    case PaymentMethod.bankTransfer:
+      return 'BANK_TRANSFER';
+    case PaymentMethod.cash:
+      return 'CASH'; // ⚠️ NOT "ESPECE"
+  }
 }

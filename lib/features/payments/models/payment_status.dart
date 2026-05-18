@@ -1,36 +1,41 @@
-import 'package:json_annotation/json_annotation.dart';
-
+/// Payment status enum with clean English names
 enum PaymentStatus {
-  @JsonValue('PENDING')
-  pending('PENDING'),
-  @JsonValue('COMPLETED')
-  completed('COMPLETED'),
-  @JsonValue('FAILED')
-  failed('FAILED'),
-  @JsonValue('REFUNDED')
-  refunded('REFUNDED');
+  pending,
+  completed,
+  failed,
+  refunded,
+}
 
-  final String value;
-  const PaymentStatus(this.value);
-
-  static PaymentStatus fromString(String status) {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-      case 'EN_ATTENTE':
-        return PaymentStatus.pending;
-      case 'COMPLETED':
-      case 'COMPLETE':
-        return PaymentStatus.completed;
-      case 'FAILED':
-      case 'ECHOUE':
-        return PaymentStatus.failed;
-      case 'REFUNDED':
-      case 'REMBOURSE':
-        return PaymentStatus.refunded;
-      default:
-        throw ArgumentError('Invalid payment status: $status');
-    }
+/// 🔄 Mapper: Backend String → Flutter Enum
+PaymentStatus paymentStatusFromString(String value) {
+  switch (value.toUpperCase()) {
+    case 'EN_ATTENTE':
+    case 'PENDING':
+      return PaymentStatus.pending;
+    case 'COMPLETE':
+    case 'COMPLETED':
+      return PaymentStatus.completed;
+    case 'ECHOUE':
+    case 'FAILED':
+      return PaymentStatus.failed;
+    case 'REMBOURSE':
+    case 'REFUNDED':
+      return PaymentStatus.refunded;
+    default:
+      return PaymentStatus.pending;
   }
+}
 
-  String toJson() => value;
+/// 🔄 Mapper: Flutter Enum → Backend String
+String paymentStatusToString(PaymentStatus status) {
+  switch (status) {
+    case PaymentStatus.pending:
+      return 'EN_ATTENTE';
+    case PaymentStatus.completed:
+      return 'COMPLETE';
+    case PaymentStatus.failed:
+      return 'ECHOUE';
+    case PaymentStatus.refunded:
+      return 'REMBOURSE';
+  }
 }

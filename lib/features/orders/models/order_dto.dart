@@ -8,6 +8,7 @@ part 'order_dto.g.dart';
 @JsonSerializable()
 class OrderDto {
   final int id;
+  @JsonKey(fromJson: orderStatusFromString, toJson: orderStatusToString)
   final OrderStatus statut;
   @JsonKey(defaultValue: 0.0)
   final double total;
@@ -18,6 +19,10 @@ class OrderDto {
   final String clientNom;
   final List<OrderLineDto> orderLines;
   final PaymentDto? payment;
+  final String? paymentMethod;
+  final String? paymentStatus;
+  final String? deliveryToken;
+  final String? trackingNumber;
 
   OrderDto({
     required this.id,
@@ -29,6 +34,10 @@ class OrderDto {
     required this.clientNom,
     required this.orderLines,
     this.payment,
+    this.paymentMethod,
+    this.paymentStatus,
+    this.deliveryToken,
+    this.trackingNumber,
   });
 
   factory OrderDto.fromJson(Map<String, dynamic> json) =>

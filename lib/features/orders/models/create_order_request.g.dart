@@ -11,10 +11,14 @@ CreateOrderRequest _$CreateOrderRequestFromJson(Map<String, dynamic> json) =>
       orderLines: (json['orderLines'] as List<dynamic>)
           .map((e) => OrderLineRequest.fromJson(e as Map<String, dynamic>))
           .toList(),
+      paymentMethod: json['paymentMethod'] as String,
     );
 
 Map<String, dynamic> _$CreateOrderRequestToJson(CreateOrderRequest instance) =>
-    <String, dynamic>{'orderLines': instance.orderLines};
+    <String, dynamic>{
+      'orderLines': instance.orderLines,
+      'paymentMethod': instance.paymentMethod,
+    };
 
 OrderLineRequest _$OrderLineRequestFromJson(Map<String, dynamic> json) =>
     OrderLineRequest(

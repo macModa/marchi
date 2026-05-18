@@ -7,7 +7,10 @@ part 'payment_dto.g.dart';
 @JsonSerializable()
 class PaymentDto {
   final int? id;
+  final double? montant;
+  @JsonKey(fromJson: paymentMethodFromString, toJson: paymentMethodToString)
   final PaymentMethod methode;
+  @JsonKey(fromJson: paymentStatusFromString, toJson: paymentStatusToString)
   final PaymentStatus statut;
   final String? reference;
   final String? dateCreation;
@@ -16,6 +19,7 @@ class PaymentDto {
 
   PaymentDto({
     this.id,
+    this.montant,
     required this.methode,
     required this.statut,
     this.reference,

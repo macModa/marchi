@@ -1,5 +1,3 @@
-import 'package:dio/dio.dart';
-
 /// Base exception class for all app exceptions
 abstract class AppException implements Exception {
   final String message;

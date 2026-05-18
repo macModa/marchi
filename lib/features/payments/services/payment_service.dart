@@ -4,16 +4,28 @@ import '../../../core/models/api_response.dart';
 import '../../../core/network/dio_client.dart';
 import '../models/payment_dto.dart';
 import '../models/create_payment_request.dart';
+import 'package:dio/dio.dart';
 
 class PaymentService {
+  final Dio? _dio;
   final DioClient _dioClient = DioClient();
 
-  Future<ApiResponse<PaymentDto>> createPayment(int orderId, CreatePaymentRequest request) async {
+  PaymentService([this._dio]);
+
+  Future<ApiResponse<PaymentDto>> createPayment(
+    int orderId,
+    CreatePaymentRequest request,
+  ) async {
     try {
-      final response = await _dioClient.post(
-        ApiConstants.createPaymentForOrder(orderId),
-        data: request.toJson(),
-      );
+      final response = await (_dio != null
+          ? _dio.post(
+              ApiConstants.createPaymentForOrder(orderId),
+              data: request.toJson(),
+            )
+          : _dioClient.post(
+              ApiConstants.createPaymentForOrder(orderId),
+              data: request.toJson(),
+            ));
 
       return ApiResponse<PaymentDto>.fromJson(
         response.data as Map<String, dynamic>,
@@ -26,7 +38,9 @@ class PaymentService {
 
   Future<ApiResponse<PaymentDto>> getPaymentByOrderId(int orderId) async {
     try {
-      final response = await _dioClient.get(ApiConstants.paymentByOrder(orderId));
+      final response = await (_dio != null
+          ? _dio.get(ApiConstants.paymentByOrder(orderId))
+          : _dioClient.get(ApiConstants.paymentByOrder(orderId)));
 
       return ApiResponse<PaymentDto>.fromJson(
         response.data as Map<String, dynamic>,
@@ -39,7 +53,9 @@ class PaymentService {
 
   Future<ApiResponse<PaymentDto>> getPaymentById(int id) async {
     try {
-      final response = await _dioClient.get(ApiConstants.paymentById(id));
+      final response = await (_dio != null
+          ? _dio.get(ApiConstants.paymentById(id))
+          : _dioClient.get(ApiConstants.paymentById(id)));
 
       return ApiResponse<PaymentDto>.fromJson(
         response.data as Map<String, dynamic>,

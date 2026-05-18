@@ -4,6 +4,7 @@ import '../models/auth_request.dart';
 import '../models/auth_response.dart';
 import '../models/register_request.dart';
 import '../services/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 final secureStorageProvider = Provider<SecureStorage>((ref) => SecureStorage());
@@ -59,6 +60,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthResponse?>> {
           email: authData.email,
           role: authData.role,
         );
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("role", authData.role);
+
         state = AsyncValue.data(authData);
       } else {
         state = AsyncValue.error(response.message, StackTrace.current);
@@ -80,6 +85,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthResponse?>> {
           email: authData.email,
           role: authData.role,
         );
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("role", authData.role);
+
         state = AsyncValue.data(authData);
       } else {
         state = AsyncValue.error(response.message, StackTrace.current);
@@ -91,6 +100,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<AuthResponse?>> {
 
   Future<void> logout() async {
     await _secureStorage.clearAll();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("role");
     state = const AsyncValue.data(null);
   }
 }

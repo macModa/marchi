@@ -5,6 +5,10 @@ part 'create_payment_request.g.dart';
 
 @JsonSerializable()
 class CreatePaymentRequest {
+  @JsonKey(
+    fromJson: paymentMethodFromString,
+    toJson: paymentMethodToString,
+  )
   final PaymentMethod methode;
   final String? reference;
 

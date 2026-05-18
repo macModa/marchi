@@ -65,3 +65,95 @@ final searchProductsProvider = FutureProvider.family<PagedResponse<ProductDto>, 
     throw response.message;
   }
 });
+
+class ProductListState {
+  final List<ProductDto> products;
+  final int page;
+  final bool hasMore;
+  final int? categoryId;
+  final bool isLoading;
+  final String? error;
+
+  ProductListState({
+    required this.products,
+    required this.page,
+    required this.hasMore,
+    this.categoryId,
+    required this.isLoading,
+    this.error,
+  });
+
+  ProductListState.initial()
+      : products = [],
+        page = 0,
+        hasMore = true,
+        categoryId = null,
+        isLoading = false,
+        error = null;
+
+  ProductListState copyWith({
+    List<ProductDto>? products,
+    int? page,
+    bool? hasMore,
+    int? categoryId,
+    bool? isLoading,
+    String? error,
+  }) {
+    return ProductListState(
+      products: products ?? this.products,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
+      categoryId: categoryId ?? this.categoryId,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+    );
+  }
+}
+
+class ProductListNotifier extends StateNotifier<ProductListState> {
+  final ProductService _productService;
+
+  ProductListNotifier(this._productService) : super(ProductListState.initial()) {
+    loadProducts();
+  }
+
+  Future<void> loadProducts({bool refresh = false}) async {
+    if (state.isLoading || (!state.hasMore && !refresh)) return;
+
+    if (refresh) {
+      state = state.copyWith(isLoading: true, products: [], page: 0, hasMore: true, error: null);
+    } else {
+      state = state.copyWith(isLoading: true, error: null);
+    }
+
+    try {
+      final response = await (state.categoryId == null
+          ? _productService.getProducts(page: state.page, size: 20)
+          : _productService.getProductsByCategory(state.categoryId!, page: state.page, size: 20));
+
+      if (response.success && response.data != null) {
+        final pagedData = response.data!;
+        state = state.copyWith(
+          products: [...state.products, ...pagedData.content],
+          page: state.page + 1,
+          hasMore: !pagedData.last,
+          isLoading: false,
+        );
+      } else {
+        state = state.copyWith(isLoading: false, error: response.message);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  void setCategory(int? categoryId) {
+    if (state.categoryId == categoryId) return;
+    state = state.copyWith(categoryId: categoryId);
+    loadProducts(refresh: true);
+  }
+}
+
+final productListProvider = StateNotifierProvider<ProductListNotifier, ProductListState>((ref) {
+  return ProductListNotifier(ref.watch(productServiceProvider));
+});

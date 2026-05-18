@@ -1,46 +1,51 @@
-import 'package:json_annotation/json_annotation.dart';
-
+/// Order status enum — aligned with Java backend OrderStatus enum
+/// Java values: PENDING, CONFIRMED, PROCESSING, SHIPPED, DELIVERED, CANCELLED
 enum OrderStatus {
-  @JsonValue('PENDING')
-  pending('PENDING'),
-  @JsonValue('CONFIRMED')
-  confirmed('CONFIRMED'),
-  @JsonValue('PROCESSING')
-  processing('PROCESSING'),
-  @JsonValue('SHIPPED')
-  shipped('SHIPPED'),
-  @JsonValue('DELIVERED')
-  delivered('DELIVERED'),
-  @JsonValue('CANCELLED')
-  cancelled('CANCELLED');
+  pending,
+  confirmed,
+  processing,  // ← PROCESSING (pas inProgress)
+  shipped,
+  delivered,
+  cancelled,   // ← double L (pas canceled)
+}
 
-  final String value;
-  const OrderStatus(this.value);
-
-  static OrderStatus fromString(String status) {
-    switch (status.toUpperCase()) {
-      case 'PENDING':
-      case 'EN_ATTENTE':
-        return OrderStatus.pending;
-      case 'CONFIRMED':
-      case 'CONFIRMEE':
-        return OrderStatus.confirmed;
-      case 'PROCESSING':
-      case 'EN_COURS':
-        return OrderStatus.processing;
-      case 'SHIPPED':
-      case 'EXPEDIEE':
-        return OrderStatus.shipped;
-      case 'DELIVERED':
-      case 'LIVREE':
-        return OrderStatus.delivered;
-      case 'CANCELLED':
-      case 'ANNULEE':
-        return OrderStatus.cancelled;
-      default:
-        throw ArgumentError('Invalid order status: $status');
-    }
+/// 🔄 Mapper: Backend String → Flutter Enum
+OrderStatus orderStatusFromString(String? value) {
+  if (value == null) return OrderStatus.pending;
+  switch (value.toUpperCase().trim()) {
+    case 'PENDING':
+      return OrderStatus.pending;
+    case 'CONFIRMED':
+      return OrderStatus.confirmed;
+    case 'PROCESSING':
+      return OrderStatus.processing;
+    case 'SHIPPED':
+      return OrderStatus.shipped;
+    case 'DELIVERED':
+      return OrderStatus.delivered;
+    case 'CANCELLED':
+      return OrderStatus.cancelled;
+    default:
+      assert(false, '⚠️ Unknown OrderStatus from backend: "$value"');
+      return OrderStatus.pending;
   }
+}
 
-  String toJson() => value;
+/// 🔄 Mapper: Flutter Enum → Backend String
+/// Sends exact Java enum values
+String orderStatusToString(OrderStatus status) {
+  switch (status) {
+    case OrderStatus.pending:
+      return 'PENDING';
+    case OrderStatus.confirmed:
+      return 'CONFIRMED';
+    case OrderStatus.processing:
+      return 'PROCESSING';
+    case OrderStatus.shipped:
+      return 'SHIPPED';
+    case OrderStatus.delivered:
+      return 'DELIVERED';
+    case OrderStatus.cancelled:
+      return 'CANCELLED';
+  }
 }
