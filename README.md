@@ -1,135 +1,232 @@
-# Marchi - Tunisian Artisanal Marketplace
+# Marchi — Marketplace Artisanale Tunisienne
 
-Marchi is a full-stack marketplace application designed to connect Tunisian artisans with clients. The platform enables artisans to showcase their handmade products, while clients can browse, search, and purchase unique artisanal items.
+Marchi est une application mobile full-stack connectant les artisans tunisiens à leurs clients. Les artisans y gèrent leur boutique et leurs produits ; les clients parcourent, recherchent et commandent des articles artisanaux authentiques. La livraison est gérée via un système de bons de livraison sécurisés avec QR code et un réseau de points relais basé sur les codes postaux tunisiens.
 
-## Tech Stack
-Une méthode innovante de livraison via Colis Postal a été implémentée, basée sur une gestion structurée des codes postaux et des points relais. Cette approche améliore la logistique et optimise la distribution des produits artisanaux.
+---
 
-### Frontend
-- **Framework**: Flutter (Mobile)
-- **State Management**: Riverpod (with Generator)
-- **Networking**: Dio
-- **Storage**: Flutter Secure Storage (JWT), Shared Preferences
-- **Architecture**: Feature-first Layered Architecture
+## Stack Technique
 
-### Backend
-- **Framework**: Spring Boot (REST API)
-- **Security**: Spring Security with JWT
-- **Database**: MySQL
-- **Persistence**: Spring Data JPA
-- **Language**: Java 17
+| Couche | Technologie |
+|---|---|
+| Mobile | Flutter |
+| State Management | Riverpod (avec Generator) |
+| Networking | Dio |
+| Stockage local | Flutter Secure Storage (JWT), Shared Preferences |
+| Backend | Spring Boot 3 — REST API |
+| Sécurité | Spring Security + JWT |
+| Base de données | MySQL 8 |
+| Persistance | Spring Data JPA / Hibernate |
+| Langage backend | Java 17 |
 
-## Architecture Overview
+---
 
-The project follows a clean, layered architecture to ensure separation of concerns and maintainability.
+## Architecture
 
-### Backend Structure
-- **Controller Layer**: REST Endpoints handling HTTP requests and responses.
-- **Service Layer**: Business logic implementation.
-- **Repository Layer**: Data access using JPA/Hibernate.
-- **Entity Layer**: Database mapping and domain models.
-- **DTO Layer**: Data Transfer Objects for API communication.
-- **Security**: JWT-based stateless authentication.
+### Backend — Architecture en couches
 
-### Frontend Structure
-- **Features Layer**: Modularized by domain (Auth, Products, Orders, Payments).
-- **Presentation**: Flutter screens and widgets.
-- **Providers**: State management and business logic.
-- **Services**: API client wrappers.
+```
+Controller  →  Service  →  Repository  →  MySQL
+     ↕              ↕
+    DTO         Entity (JPA)
+     ↕
+  Security (JWT)
+```
 
-## Implemented Features
+- **Controller** : endpoints REST, gestion des requêtes HTTP
+- **Service** : logique métier et transactions `@Transactional`
+- **Repository** : accès aux données via Spring Data JPA
+- **Entity** : modèles de domaine mappés en base
+- **DTO** : objets d'échange avec le frontend mobile (isolation des entités JPA)
+- **Security** : authentification stateless JWT
 
-### Authentication & Authorization
-- User registration and login.
-- JWT-based authentication.
-- Role-based access control (ADMIN, ARTISAN, CLIENT).
-- Secure token storage on the mobile app.
+### Frontend — Architecture Feature-First
 
-### Product Management
-- Browse products (Paginated).
-- View product details.
-- Search products by keyword.
-- Filter products by category.
-- Artisan-specific product management (Create, Update, Delete).
-- Product image upload (Multi-part).
+```
+features/
+├── auth/
+├── products/
+├── orders/
+├── payments/
+├── bon_livraison/
+└── delivery/
+```
 
-### Order Processing
-- Create orders (Client).
-- View order history (Client/Admin).
-- Cancel orders (Client).
-- Update order status (Admin).
+Chaque feature est autonome et contient ses propres screens, providers, services et modèles.
 
-### Payment Integration
-- Create payment for orders.
-- Payment status tracking (Pending, Completed, Failed, Refunded).
-- Admin management of payment statuses.
+---
 
-## Authentication & Roles
+## Fonctionnalités
 
-The system uses three distinct roles:
-- **CLIENT**: Can browse products, create orders, and manage their payments.
-- **ARTISAN**: Can manage their own shop and products.
-- **ADMIN**: Has oversight of all orders, payments, and system configurations.
+### Authentification & Autorisation
+- Inscription et connexion (JWT)
+- Contrôle d'accès par rôle : `ADMIN`, `ARTISAN`, `CLIENT`
+- Token stocké de manière sécurisée côté mobile
 
-## Database Design
+### Gestion des Produits
+- Catalogue paginé avec recherche par mot-clé et filtre par catégorie
+- Fiche produit détaillée
+- Upload d'images (multipart)
+- Gestion complète pour l'artisan (Créer, Modifier, Supprimer)
 
-The database schema includes the following key entities:
-- **User**: Base entity for all users (Shared table via JOINED inheritance).
-- **Client**: Extends User, represents customers.
-- **Artisan**: Extends User, includes shop-specific details (Shop name, description).
-- **Product**: Managed by artisans, linked to categories.
-- **Category**: Hierarchical grouping for products.
-- **Order**: Links clients to products via Order Lines.
-- **OrderLine**: Specific items within an order with quantity and price.
-- **Payment**: Linked to orders for transaction tracking.
+### Commandes
+- Création de commande (Client)
+- Historique des commandes (Client / Admin)
+- Annulation de commande (Client)
+- Mise à jour du statut (Admin)
 
-## Environment & Setup
+### Paiements
+- Création de paiement lié à une commande
+- Suivi du statut : `PENDING`, `COMPLETED`, `FAILED`, `REFUNDED`
+- Gestion admin des paiements
+
+### Bon de Livraison avec QR Code
+
+Un système sécurisé de bons de livraison PDF est intégré, couvrant l'ensemble du cycle de livraison.
+
+**Génération (Artisan) :**
+- L'artisan génère un bon de livraison PDF officiel depuis son interface
+- Le bon inclut : expéditeur / destinataire, tableau des produits avec poids, montant en toutes lettres en français (ex. : *Cent quarante-cinq dinars et cinq cents millimes*), zone de signature client
+- Un QR code unique et sécurisé est intégré au document
+
+**Validation (Client) :**
+- Le client scanne le QR code via l'application mobile à la réception du colis
+- Le backend vérifie que le scanner est bien le client associé à la commande
+- La livraison est confirmée et le statut mis à jour
+
+**Flux de sécurité :**
+```
+Artisan  →  génère le bon PDF (vérification propriété commande)
+     ↓
+   QR Code unique (token signé, durée limitée)
+     ↓
+Client  →  scanne le QR code à la réception
+     ↓
+Backend  →  valide l'identité du client + expiration du token
+     ↓
+Commande  →  statut mis à jour : LIVRÉ
+```
+
+### Livraison via Codes Postaux Tunisiens
+- Table normalisée et indexée des codes postaux tunisiens
+- Sélection de points relais par code postal
+- API interne `/validate-address` exposée au frontend Flutter
+- Cohérence garantie des données entre mobile et backend
+
+### Messagerie WhatsApp
+- Communication directe client-artisan via URL Scheme WhatsApp
+- Aucun stockage intermédiaire côté serveur
+- Intégration native et légère
+
+---
+
+## Modèle de Données
+
+```
+User (abstrait — héritage JOINED)
+├── Client        → passe des commandes
+└── Artisan       → gère une boutique
+
+Category          → hiérarchie de produits
+Product           → rattaché à un Artisan et une Category
+Order             → passée par un Client
+├── OrderLine     → produit + quantité + prix
+└── Payment       → transaction liée à la commande
+
+BonLivraison      → document PDF lié à une commande
+DeliveryToken     → QR code signé avec expiration
+PostalCode        → table normalisée des codes postaux TN
+RelayPoint        → point relais lié à un code postal
+```
+
+---
+
+## Rôles & Permissions
+
+| Rôle | Permissions |
+|---|---|
+| `CLIENT` | Parcourir, commander, payer, scanner le QR de livraison |
+| `ARTISAN` | Gérer ses produits, générer les bons de livraison |
+| `ADMIN` | Accès complet : commandes, paiements, utilisateurs |
+
+---
+
+## Installation
 
 ### Backend (Spring Boot)
-1. Configure MySQL database in `src/main/resources/application.properties`.
-2. Run `mvn install` to download dependencies.
-3. Launch the application: `mvn spring-boot:run`.
+
+```bash
+# 1. Créer la base de données
+mysql -u root -p -e "CREATE DATABASE marketplace_db;"
+
+# 2. Configurer application.yml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/marketplace_db
+    username: votre_username
+    password: votre_password
+
+# 3. Lancer
+mvn spring-boot:run
+```
 
 ### Frontend (Flutter)
-1. Ensure Flutter SDK is installed.
-2. Run `flutter pub get`.
-3. Update the API base URL in the configuration (e.g., `DioClient`).
-4. Launch the app: `flutter run`.
 
-## Project Status
-
-### Completed
-- Core Authentication (JWT).
-- Product Browsing & Management.
-- Category Filtering.
-- Order Creation Flow.
-- Payment entity and status management.
-
-### In Progress
-- Advanced Artisan Dashboard.
-- Real-time order notifications.
-- Enhanced search filtering (price range, location).
-
-## Future Roadmap
-
-- **Short Term**: Implement product reviews and ratings.
-- **Mid Term**: Integration with local Tunisian payment gateways.
-- **Long Term**: Recommendation engine based on user preferences.
-
-## License & Contribution
-
-This project is developed for the Tunisian artisanal community. Contributions are welcome via Pull Requests. Please ensure all code adheres to the established architecture and naming conventions.
-
-
-
-key
-
+```bash
+# 1. Nettoyer et installer les dépendances
 flutter clean
 flutter pub get
+
+# 2. Générer le code (Riverpod, Freezed, JSON)
 flutter pub run build_runner build --delete-conflicting-outputs
+
+# 3. Lancer
+flutter run
+# ou sur navigateur Edge pour les tests
 flutter run -d edge
-Intégration de la messagerie WhatsApp via URL Scheme permettant la communication directe client-artisan sans stockage intermédiaire côté serveur.
+```
 
+> Mettre à jour l'URL de base de l'API dans `lib/core/constants/api_constants.dart`.
 
+---
 
-La méthodologie Agile Scrum a été adoptée avec une organisation en 4 sprints de 2 semaines chacun, permettant une livraison incrémentale et une adaptation continue aux besoins.
+## Méthodologie
+
+Le projet a été développé selon la méthodologie **Agile Scrum**, organisée en **4 sprints de 2 semaines** :
+
+| Sprint | Objectif |
+|---|---|
+| Sprint 1 | Authentification JWT, architecture de base |
+| Sprint 2 | Produits, catégories, gestion artisan |
+| Sprint 3 | Commandes, paiements, tableau de bord admin |
+| Sprint 4 | Bon de livraison QR, codes postaux, WhatsApp |
+
+---
+
+## État du Projet
+
+| Fonctionnalité | Statut |
+|---|---|
+| Authentification JWT | ✅ Terminé |
+| Gestion produits & catégories | ✅ Terminé |
+| Commandes & paiements | ✅ Terminé |
+| Bon de livraison PDF + QR | ✅ Terminé |
+| Codes postaux tunisiens | ✅ Terminé |
+| Messagerie WhatsApp | ✅ Terminé |
+| Dashboard artisan avancé | 🔄 En cours |
+| Notifications temps réel | 🔄 En cours |
+| Filtres avancés (prix, localisation) | 🔄 En cours |
+
+---
+
+## Roadmap
+
+- **Court terme** : Avis et notes sur les produits
+- **Moyen terme** : Intégration des passerelles de paiement tunisiennes locales
+- **Long terme** : Moteur de recommandation basé sur les préférences utilisateur
+
+---
+
+## Licence
+
+Projet éducatif développé pour la communauté artisanale tunisienne — PFE.
+Les contributions sont les bienvenues via Pull Request, dans le respect de l'architecture et des conventions de nommage établies.
