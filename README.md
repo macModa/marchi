@@ -1,6 +1,27 @@
 # Marchi — Marketplace Artisanale Tunisienne
 
-Marchi est une application mobile full-stack connectant les artisans tunisiens à leurs clients. Les artisans y gèrent leur boutique et leurs produits ; les clients parcourent, recherchent et commandent des articles artisanaux authentiques. La livraison est gérée via un système de bons de livraison sécurisés avec QR code et un réseau de points relais basé sur les codes postaux tunisiens.
+**Marchi** est une application mobile full-stack connectant les artisans tunisiens à leurs clients. Les artisans y gèrent leur boutique et leurs produits ; les clients parcourent, recherchent et commandent des articles artisanaux authentiques.
+
+La livraison est gérée via un système de bons de livraison sécurisés avec QR code et un réseau de points relais basé sur les codes postaux tunisiens.
+
+## 🎬 Démonstration vidéo
+
+**Découvrez Marchi en action :** la vidéo présente le workflow complet de l'application, de la navigation dans le catalogue jusqu'à la gestion des commandes et au processus de livraison.
+
+▶️ **[Regarder la démonstration complète sur LinkedIn](https://lnkd.in/p/eEx9zK7g)**
+
+## 📋 Table des matières
+
+- [Démonstration vidéo](#-démonstration-vidéo)
+- [Stack technique](#-stack-technique)
+- [Architecture](#-architecture)
+- [Fonctionnalités](#-fonctionnalités)
+- [Modèle de données](#-modèle-de-données)
+- [Rôles et permissions](#-rôles-et-permissions)
+- [Installation](#-installation)
+- [Méthodologie](#-méthodologie)
+- [État du projet](#-état-du-projet)
+- [Roadmap](#-roadmap)
 
 ---
 
@@ -9,7 +30,7 @@ Marchi est une application mobile full-stack connectant les artisans tunisiens �
 | Couche | Technologie |
 |---|---|
 | Mobile | Flutter |
-| State Management | Riverpod (avec Generator) |
+| State Management | Riverpod avec Generator |
 | Networking | Dio |
 | Stockage local | Flutter Secure Storage (JWT), Shared Preferences |
 | Backend | Spring Boot 3 — REST API |
@@ -24,7 +45,7 @@ Marchi est une application mobile full-stack connectant les artisans tunisiens �
 
 ### Backend — Architecture en couches
 
-```
+```text
 Controller  →  Service  →  Repository  →  MySQL
      ↕              ↕
     DTO         Entity (JPA)
@@ -32,16 +53,16 @@ Controller  →  Service  →  Repository  →  MySQL
   Security (JWT)
 ```
 
-- **Controller** : endpoints REST, gestion des requêtes HTTP
-- **Service** : logique métier et transactions `@Transactional`
-- **Repository** : accès aux données via Spring Data JPA
-- **Entity** : modèles de domaine mappés en base
-- **DTO** : objets d'échange avec le frontend mobile (isolation des entités JPA)
-- **Security** : authentification stateless JWT
+- **Controller** : endpoints REST et gestion des requêtes HTTP.
+- **Service** : logique métier et transactions `@Transactional`.
+- **Repository** : accès aux données via Spring Data JPA.
+- **Entity** : modèles de domaine mappés en base.
+- **DTO** : objets d'échange avec le frontend mobile, isolant les entités JPA.
+- **Security** : authentification stateless JWT.
 
 ### Frontend — Architecture Feature-First
 
-```
+```text
 features/
 ├── auth/
 ├── products/
@@ -51,182 +72,199 @@ features/
 └── delivery/
 ```
 
-Chaque feature est autonome et contient ses propres screens, providers, services et modèles.
+Chaque feature est autonome et contient ses propres écrans, providers, services et modèles.
 
 ---
 
 ## Fonctionnalités
 
-### Authentification & Autorisation
-- Inscription et connexion (JWT)
-- Contrôle d'accès par rôle : `ADMIN`, `ARTISAN`, `CLIENT`
-- Token stocké de manière sécurisée côté mobile
+### Authentification et autorisation
 
-### Gestion des Produits
-- Catalogue paginé avec recherche par mot-clé et filtre par catégorie
-- Fiche produit détaillée
-- Upload d'images (multipart)
-- Gestion complète pour l'artisan (Créer, Modifier, Supprimer)
+- Inscription et connexion via JWT.
+- Contrôle d'accès par rôle : `ADMIN`, `ARTISAN`, `CLIENT`.
+- Token stocké de manière sécurisée côté mobile.
+
+### Gestion des produits
+
+- Catalogue paginé avec recherche par mot-clé et filtre par catégorie.
+- Fiche produit détaillée.
+- Upload d'images via multipart.
+- Gestion complète des produits par l'artisan : création, modification et suppression.
 
 ### Commandes
-- Création de commande (Client)
-- Historique des commandes (Client / Admin)
-- Annulation de commande (Client)
-- Mise à jour du statut (Admin)
+
+- Création de commande par le client.
+- Historique des commandes pour le client et l'administrateur.
+- Annulation de commande par le client.
+- Mise à jour du statut par l'administrateur.
 
 ### Paiements
-- Création de paiement lié à une commande
-- Suivi du statut : `PENDING`, `COMPLETED`, `FAILED`, `REFUNDED`
-- Gestion admin des paiements
 
-### Bon de Livraison avec QR Code
+- Création d'un paiement lié à une commande.
+- Suivi des statuts : `PENDING`, `COMPLETED`, `FAILED`, `REFUNDED`.
+- Gestion administrative des paiements.
 
-Un système sécurisé de bons de livraison PDF est intégré, couvrant l'ensemble du cycle de livraison.
+### Bons de livraison avec QR code
 
-**Génération (Artisan) :**
-- L'artisan génère un bon de livraison PDF officiel depuis son interface
-- Le bon inclut : expéditeur / destinataire, tableau des produits avec poids, montant en toutes lettres en français (ex. : *Cent quarante-cinq dinars et cinq cents millimes*), zone de signature client
-- Un QR code unique et sécurisé est intégré au document
+Un système de génération de bons de livraison PDF est intégré pour couvrir le cycle de livraison.
 
-**Validation (Client) :**
-- Le client scanne le QR code via l'application mobile à la réception du colis
-- Le backend vérifie que le scanner est bien le client associé à la commande
-- La livraison est confirmée et le statut mis à jour
+**Génération par l'artisan :**
+- Génération d'un bon PDF depuis l'interface.
+- Informations expéditeur et destinataire.
+- Tableau des produits avec poids et montants.
+- Montant en toutes lettres en français.
+- Zone de signature du client.
+- QR code unique et sécurisé.
 
-**Flux de sécurité :**
+**Validation par le client :**
+- Scan du QR code à la réception du colis.
+- Vérification de l'identité du client associé à la commande.
+- Vérification de l'expiration du token.
+- Confirmation de la livraison et mise à jour du statut.
+
+```text
+Artisan → Génération du bon PDF
+        → QR code signé avec expiration
+        → Scan par le client à la réception
+        → Vérification côté backend
+        → Commande marquée comme LIVRÉE
 ```
-Artisan  →  génère le bon PDF (vérification propriété commande)
-     ↓
-   QR Code unique (token signé, durée limitée)
-     ↓
-Client  →  scanne le QR code à la réception
-     ↓
-Backend  →  valide l'identité du client + expiration du token
-     ↓
-Commande  →  statut mis à jour : LIVRÉ
-```
 
-### Livraison via Codes Postaux Tunisiens
-- Table normalisée et indexée des codes postaux tunisiens
-- Sélection de points relais par code postal
-- API interne `/validate-address` exposée au frontend Flutter
-- Cohérence garantie des données entre mobile et backend
+### Livraison via codes postaux tunisiens
+
+- Table normalisée et indexée des codes postaux tunisiens.
+- Sélection de points relais par code postal.
+- API interne `/validate-address` exposée au frontend Flutter.
+- Cohérence des données entre mobile et backend.
 
 ### Messagerie WhatsApp
-- Communication directe client-artisan via URL Scheme WhatsApp
-- Aucun stockage intermédiaire côté serveur
-- Intégration native et légère
+
+- Communication directe entre client et artisan via URL Scheme WhatsApp.
+- Aucun stockage intermédiaire des messages côté serveur.
 
 ---
 
-## Modèle de Données
+## Modèle de données
 
-```
+```text
 User (abstrait — héritage JOINED)
-├── Client        → passe des commandes
-└── Artisan       → gère une boutique
+├── Client
+└── Artisan
 
-Category          → hiérarchie de produits
-Product           → rattaché à un Artisan et une Category
-Order             → passée par un Client
-├── OrderLine     → produit + quantité + prix
-└── Payment       → transaction liée à la commande
+Category
+Product
+Order
+├── OrderLine
+└── Payment
 
-BonLivraison      → document PDF lié à une commande
-DeliveryToken     → QR code signé avec expiration
-PostalCode        → table normalisée des codes postaux TN
-RelayPoint        → point relais lié à un code postal
+BonLivraison
+DeliveryToken
+PostalCode
+RelayPoint
 ```
+
+- `User` : utilisateur de base.
+- `Client` : passe des commandes.
+- `Artisan` : gère sa boutique.
+- `Category` : hiérarchie des catégories de produits.
+- `Product` : produit lié à un artisan et à une catégorie.
+- `Order` : commande passée par un client.
+- `OrderLine` : produit, quantité et prix.
+- `Payment` : paiement associé à une commande.
+- `BonLivraison` : document PDF associé à une commande.
+- `DeliveryToken` : token de QR code signé avec expiration.
+- `PostalCode` : code postal tunisien.
+- `RelayPoint` : point relais associé à un code postal.
 
 ---
 
-## Rôles & Permissions
+## Rôles et permissions
 
 | Rôle | Permissions |
 |---|---|
-| `CLIENT` | Parcourir, commander, payer, scanner le QR de livraison |
-| `ARTISAN` | Gérer ses produits, générer les bons de livraison |
-| `ADMIN` | Accès complet : commandes, paiements, utilisateurs |
+| `CLIENT` | Parcourir, commander, payer et scanner le QR de livraison |
+| `ARTISAN` | Gérer ses produits et générer les bons de livraison |
+| `ADMIN` | Gestion des commandes, paiements et utilisateurs |
 
 ---
 
 ## Installation
 
-### Backend (Spring Boot)
+### Backend — Spring Boot
 
 ```bash
 # 1. Créer la base de données
 mysql -u root -p -e "CREATE DATABASE marketplace_db;"
 
 # 2. Configurer application.yml
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/marketplace_db
-    username: votre_username
-    password: votre_password
+# Renseigner l'URL, le nom d'utilisateur et le mot de passe MySQL.
 
-# 3. Lancer
+# 3. Lancer le backend
 mvn spring-boot:run
 ```
 
-### Frontend (Flutter)
+### Frontend — Flutter
 
 ```bash
-# 1. Nettoyer et installer les dépendances
-flutter clean
+# 1. Installer les dépendances
 flutter pub get
 
-# 2. Générer le code (Riverpod, Freezed, JSON)
-flutter pub run build_runner build --delete-conflicting-outputs
+# 2. Générer le code nécessaire
+dart run build_runner build --delete-conflicting-outputs
 
-# 3. Lancer
+# 3. Lancer l'application
 flutter run
-# ou sur navigateur Edge pour les tests
-flutter run -d edge
 ```
 
-> Mettre à jour l'URL de base de l'API dans `lib/core/constants/api_constants.dart`.
+Mettre à jour l'URL de base de l'API dans `lib/core/constants/api_constants.dart`.
 
 ---
 
 ## Méthodologie
 
-Le projet a été développé selon la méthodologie **Agile Scrum**, organisée en **4 sprints de 2 semaines** :
+Le projet a été développé selon la méthodologie **Agile Scrum**, organisée en quatre sprints de deux semaines.
 
 | Sprint | Objectif |
 |---|---|
-| Sprint 1 | Authentification JWT, architecture de base |
-| Sprint 2 | Produits, catégories, gestion artisan |
-| Sprint 3 | Commandes, paiements, tableau de bord admin |
-| Sprint 4 | Bon de livraison QR, codes postaux, WhatsApp |
+| Sprint 1 | Authentification JWT et architecture de base |
+| Sprint 2 | Produits, catégories et gestion artisan |
+| Sprint 3 | Commandes, paiements et administration |
+| Sprint 4 | Bons de livraison QR, codes postaux et WhatsApp |
 
 ---
 
-## État du Projet
+## État du projet
 
 | Fonctionnalité | Statut |
 |---|---|
 | Authentification JWT | ✅ Terminé |
-| Gestion produits & catégories | ✅ Terminé |
-| Commandes & paiements | ✅ Terminé |
-| Bon de livraison PDF + QR | ✅ Terminé |
+| Gestion des produits et catégories | ✅ Terminé |
+| Commandes et paiements | ✅ Terminé |
+| Bons de livraison PDF avec QR code | ✅ Terminé |
 | Codes postaux tunisiens | ✅ Terminé |
-| Messagerie WhatsApp | ✅ Terminé |
+| Intégration WhatsApp | ✅ Terminé |
 | Dashboard artisan avancé | 🔄 En cours |
-| Notifications temps réel | 🔄 En cours |
-| Filtres avancés (prix, localisation) | 🔄 En cours |
+| Notifications en temps réel | 🔄 En cours |
+| Filtres avancés par prix et localisation | 🔄 En cours |
 
 ---
 
 ## Roadmap
 
-- **Court terme** : Avis et notes sur les produits
-- **Moyen terme** : Intégration des passerelles de paiement tunisiennes locales
-- **Long terme** : Moteur de recommandation basé sur les préférences utilisateur
+- **Court terme** : avis et notes sur les produits.
+- **Moyen terme** : intégration de passerelles de paiement tunisiennes.
+- **Long terme** : moteur de recommandation basé sur les préférences des utilisateurs.
 
 ---
 
 ## Licence
 
-Projet éducatif développé pour la communauté artisanale tunisienne — PFE.
-Les contributions sont les bienvenues via Pull Request, dans le respect de l'architecture et des conventions de nommage établies.
+Projet éducatif développé dans le cadre d'un PFE, autour de la valorisation de l'artisanat tunisien.
+
+Les contributions sont les bienvenues via Pull Request, dans le respect de l'architecture et des conventions de nommage du projet.
+
+---
+
+**Développé avec Flutter, Spring Boot et MySQL.**
+
+🎬 [Voir la démonstration complète de Marchi](https://lnkd.in/p/eEx9zK7g) · 💻 [Consulter le code source](https://github.com/macModa/marchi)
